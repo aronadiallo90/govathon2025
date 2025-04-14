@@ -54,162 +54,124 @@ if (isset($_GET['error'])) {
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Dashboard - Kaiadmin Bootstrap 5 Admin Dashboard</title>
-    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-    <link rel="icon" href="../assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
-
-    <!-- Fonts and icons -->
-    <script src="../assets/js/plugin/webfont/webfont.min.js"></script>
-    <script>
-        WebFont.load({
-            google: { families: ["Public Sans:300,400,500,600,700"] },
-            custom: {
-                families: [
-                    "Font Awesome 5 Solid",
-                    "Font Awesome 5 Regular",
-                    "Font Awesome 5 Brands",
-                    "simple-line-icons",
-                ],
-                urls: ["../assets/css/fonts.min.css"],
-            },
-            active: function () {
-                sessionStorage.fonts = true;
-            },
-        });
-    </script>
-
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../assets/css/plugins.min.css" />
-    <link rel="stylesheet" href="../assets/css/kaiadmin.min.css" />
-
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" href="../assets/css/demo.css" />
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        /* Styles existants */
+        .btn { padding: 5px 10px; margin: 2px; text-decoration: none; display: inline-block; border-radius: 3px; }
+        .btn-edit { background: #2196F3; color: white; }
+        .btn-delete { background: #f44336; color: white; }
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 50%; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-        <div class="sidebar" data-background-color="dark">
-            <div class="sidebar-logo">
-                <a href="index.html" class="logo">
-                    <img src="../assets/img/kaiadmin/logo_light.svg" alt="navbar brand" class="navbar-brand" height="20" />
-                </a>
-            </div>
-        </div>
-        <!-- End Sidebar -->
+    <h1>Bienvenue <?= htmlspecialchars($admin['nom']) ?> !</h1>
+    <p>Vous êtes connecté en tant que <?= $admin['is_superadmin'] ? 'Superadmin' : 'Admin' ?>.</p>
+    <a href="logout.php">Se déconnecter</a>
 
-        <div class="main-panel">
-            <div class="main-header">
-                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
-                    <div class="container-fluid">
-                        <h3 class="fw-bold mb-3">Dashboard</h3>
-                    </div>
-                </nav>
-            </div>
+    <?php if (!empty($successMessage)): ?>
+        <div class="success"><?= htmlspecialchars($successMessage) ?></div>
+    <?php endif; ?>
 
-            <div class="container">
-                <div class="page-inner">
-                    <div class="page-header">
-                        <h4 class="page-title">Bienvenue <?= htmlspecialchars($admin['nom']) ?> !</h4>
-                        <p>Vous êtes connecté en tant que <?= $admin['is_superadmin'] ? 'Superadmin' : 'Admin' ?>.</p>
-                        <a href="logout.php" class="btn btn-danger">Se déconnecter</a>
-                    </div>
+    <?php if (!empty($errorMessage)): ?>
+        <div class="error"><?= htmlspecialchars($errorMessage) ?></div>
+    <?php endif; ?>
 
-                    <?php if (!empty($successMessage)): ?>
-                        <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($errorMessage)): ?>
-                        <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
-                    <?php endif; ?>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title">Liste des projets</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nom Projet</th>
-                                                    <th>Équipe</th>
-                                                    <th>Email</th>
-                                                    <th>Secteur</th>
-                                                    <th>Avancement</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($projets as $p): ?>
-                                                    <tr>
-                                                        <td><?= htmlspecialchars($p['nom_projet']) ?></td>
-                                                        <td><?= htmlspecialchars($p['nom_equipe']) ?></td>
-                                                        <td><?= htmlspecialchars($p['email']) ?></td>
-                                                        <td><?= htmlspecialchars($p['secteur_nom'] ?? 'Non défini') ?></td>
-                                                        <td><?= htmlspecialchars($p['avancement_prototype']) ?></td>
-                                                        <td>
-                                                            <a href="edit-projet.php?id=<?= $p['id'] ?>" class="btn btn-primary btn-sm">Modifier</a>
-                                                            <a href="#" onclick="confirmDelete(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['nom_projet'])) ?>')" class="btn btn-danger btn-sm">Supprimer</a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h2>Ajouter un projet</h2>
-                    <form method="post">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        <div class="form-group">
-                            <label for="nom_projet">Nom du projet</label>
-                            <input id="nom_projet" name="nom_projet" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nom_equipe">Nom de l'équipe</label>
-                            <input id="nom_equipe" name="nom_equipe" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input id="email" name="email" type="email" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="secteur_id">Secteur</label>
-                            <select id="secteur_id" name="secteur_id" class="form-control" required>
-                                <option value="">-- Secteur --</option>
-                                <?php
-                                    try {
-                                        $stmt = $pdo->query("SELECT id, nom FROM secteurs ORDER BY nom");
-                                        $secteurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                                        foreach ($secteurs as $secteur) {
-                                            echo '<option value="' . htmlspecialchars($secteur['id']) . '">' . 
-                                                htmlspecialchars($secteur['nom']) . '</option>';
-                                        }
-                                    } catch (PDOException $e) {
-                                        echo '<option disabled>Erreur lors du chargement</option>';
-                                    }
-                                ?>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-success">Ajouter</button>
-                    </form>
-                </div>
-            </div>
+    <h2>Liste des projets</h2>
+    <table>
+        <tr>
+            <th>Nom Projet</th>
+            <th>Équipe</th>
+            <th>Email</th>
+            <th>Secteur</th>
+            <th>Avancement</th>
+            <th>Actions</th>
+        </tr>
+        <?php foreach ($projets as $p): ?>
+            <tr>
+                <td><?= htmlspecialchars($p['nom_projet']) ?></td>
+                <td><?= htmlspecialchars($p['nom_equipe']) ?></td>
+                <td><?= htmlspecialchars($p['email']) ?></td>
+                <td><?= htmlspecialchars($p['secteur_nom'] ?? 'Non défini') ?></td>
+                <td><?= htmlspecialchars($p['avancement_prototype']) ?></td>
+                <td>
+                    <a href="edit-projet.php?id=<?= $p['id'] ?>" class="btn btn-edit">Modifier</a>
+                    <a href="#" onclick="confirmDelete(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['nom_projet'])) ?>')" class="btn btn-delete">Supprimer</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Confirmer la suppression</h3>
+            <p>Êtes-vous sûr de vouloir supprimer le projet <span id="projectName"></span>?</p>
+            <form method="post" action="dashboard.php">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" id="deleteId">
+                <button type="submit" class="btn btn-delete">Confirmer la suppression</button>
+                <button type="button" onclick="closeModal()" class="btn">Annuler</button>
+            </form>
         </div>
     </div>
 
-    <!-- Core JS Files -->
-    <script src="../assets/js/core/jquery-3.7.1.min.js"></script>
-    <script src="../assets/js/core/popper.min.js"></script>
-    <script src="../assets/js/core/bootstrap.min.js"></script>
-    <script src="../assets/js/plugin/datatables/datatables.min.js"></script>
+    <h2>Ajouter un projet</h2>
+    <form method="post">
+        <!-- Token CSRF pour sécuriser le formulaire -->
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        
+        <input name="nom_projet" placeholder="Nom du projet" required>
+        <input name="nom_equipe" placeholder="Nom de l'équipe" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="telephone" placeholder="Téléphone">
+        <input name="etablissement" placeholder="Établissement">
+        <input name="theme" placeholder="Thème" required>
+        <input name="avancement_prototype" placeholder="Avancement" required>
+        <input name="play_video_url" placeholder="Lien vidéo">
+        <textarea name="detail" placeholder="Détails"></textarea>
+        <select name="secteur_id" required>
+            <option value="">-- Secteur --</option>
+            <?php
+                try {
+                    $stmt = $pdo->query("SELECT id, nom FROM secteurs ORDER BY nom");
+                    $secteurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    foreach ($secteurs as $secteur) {
+                        echo '<option value="' . htmlspecialchars($secteur['id']) . '">' . 
+                             htmlspecialchars($secteur['nom']) . '</option>';
+                    }
+                } catch (PDOException $e) {
+                    echo '<option disabled>Erreur lors du chargement</option>';
+                }
+            ?>
+        </select>
+
+        <button type="submit">Ajouter</button>
+    </form>
 </body>
+<script>
+        // Fonction pour afficher le modal de confirmation de suppression
+        function confirmDelete(id, name) {
+            document.getElementById('deleteId').value = id;
+            document.getElementById('projectName').textContent = name;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        // Fonction pour fermer le modal
+        function closeModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Fermer le modal si l'utilisateur clique en dehors
+        window.onclick = function(event) {
+            var modal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+
 </html>
